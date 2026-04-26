@@ -1,0 +1,1776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Portfolio — [Your Name]</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ================================================
+       CSS CUSTOM PROPERTIES
+    ================================================ */
+    :root {
+      --bg:          #05070d;
+      --surface:     #0b0e1a;
+      --border:      rgba(180,160,255,0.12);
+      --accent:      #b49eff;
+      --accent2:     #64f4c2;
+      --accent3:     #ff7eb3;
+      --text:        #e8e4f0;
+      --muted:       #7a738f;
+      --gold:        #e8c87a;
+      --glow:        rgba(180,160,255,0.18);
+      --font-display:'Syne', sans-serif;
+      --font-serif:  'Cormorant Garamond', serif;
+      --font-mono:   'DM Mono', monospace;
+      --ease:        cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    /* ================================================
+       RESET & BASE
+    ================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-serif);
+      font-size: 18px;
+      line-height: 1.7;
+      cursor: none;
+      overflow-x: hidden;
+    }
+
+    ::selection { background: var(--accent); color: var(--bg); }
+
+    /* ================================================
+       CUSTOM CURSOR
+    ================================================ */
+    #cursor-dot {
+      position: fixed; top: 0; left: 0; z-index: 9999;
+      width: 8px; height: 8px;
+      background: var(--accent2);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s, background 0.3s;
+    }
+    #cursor-ring {
+      position: fixed; top: 0; left: 0; z-index: 9998;
+      width: 36px; height: 36px;
+      border: 1.5px solid var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: transform 0.18s var(--ease), width 0.3s, height 0.3s, border-color 0.3s;
+    }
+    body:has(a:hover) #cursor-ring,
+    body:has(button:hover) #cursor-ring {
+      width: 56px; height: 56px;
+      border-color: var(--accent2);
+    }
+
+    /* ================================================
+       GRAIN OVERLAY
+    ================================================ */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 1;
+      pointer-events: none;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    /* ================================================
+       SCROLLBAR
+    ================================================ */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+    /* ================================================
+       NAVIGATION
+    ================================================ */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 4rem;
+      background: linear-gradient(to bottom, rgba(5,7,13,0.95), transparent);
+      backdrop-filter: blur(12px);
+      transition: background 0.4s;
+    }
+    .nav-logo {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      text-decoration: none;
+      position: relative;
+    }
+    .nav-logo::after {
+      content: '';
+      position: absolute; bottom: -3px; left: 0;
+      width: 0; height: 1px;
+      background: var(--accent2);
+      transition: width 0.4s var(--ease);
+    }
+    .nav-logo:hover::after { width: 100%; }
+
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s;
+      position: relative;
+    }
+    .nav-links a::before {
+      content: attr(data-num);
+      position: absolute; top: -0.9em; left: 0;
+      font-size: 0.6rem;
+      color: var(--accent);
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a:hover::before { opacity: 1; transform: translateY(0); }
+
+    /* ================================================
+       HERO
+    ================================================ */
+    #hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 8rem 4rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Animated grid background */
+    #hero::after {
+      content: '';
+      position: absolute; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+      animation: gridPulse 8s ease-in-out infinite;
+    }
+    @keyframes gridPulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    .hero-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .hero-orb-1 {
+      width: 520px; height: 520px;
+      background: radial-gradient(circle, rgba(180,160,255,0.22), transparent 70%);
+      top: -100px; right: -80px;
+      animation: orbFloat1 12s ease-in-out infinite;
+    }
+    .hero-orb-2 {
+      width: 380px; height: 380px;
+      background: radial-gradient(circle, rgba(100,244,194,0.15), transparent 70%);
+      bottom: 0; left: -60px;
+      animation: orbFloat2 15s ease-in-out infinite;
+    }
+    @keyframes orbFloat1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-30px, 20px) scale(1.05); }
+      66% { transform: translate(20px, -15px) scale(0.97); }
+    }
+    @keyframes orbFloat2 {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(30px, -20px); }
+    }
+
+    .hero-content { position: relative; z-index: 2; }
+
+    .hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      width: 40px; height: 1px;
+      background: var(--accent2);
+    }
+
+    .hero-name {
+      font-family: var(--font-display);
+      font-size: clamp(3.5rem, 7vw, 6.5rem);
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
+    }
+    .hero-name .line1 { display: block; color: var(--text); }
+    .hero-name .line2 {
+      display: block;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-tagline {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 1.35rem;
+      color: var(--muted);
+      margin: 1.8rem 0 2.5rem;
+      max-width: 420px;
+      line-height: 1.6;
+    }
+
+    .hero-cta {
+      display: inline-flex; align-items: center; gap: 0.8rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--bg);
+      background: var(--accent2);
+      padding: 0.85rem 2rem;
+      text-decoration: none;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+      transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-cta::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: var(--accent);
+      transform: translateX(-100%);
+      transition: transform 0.4s var(--ease);
+    }
+    .hero-cta:hover::before { transform: translateX(0); }
+    .hero-cta:hover { box-shadow: 0 0 40px rgba(100,244,194,0.4); }
+    .hero-cta span { position: relative; z-index: 1; }
+    .hero-cta .arrow { position: relative; z-index: 1; transition: transform 0.3s; }
+    .hero-cta:hover .arrow { transform: translateX(4px); }
+
+    /* Hero image / photo panel */
+    .hero-visual {
+      position: relative; z-index: 2;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .hero-photo-frame {
+      position: relative;
+      width: 340px; height: 420px;
+    }
+    .hero-photo-frame::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+      border-radius: 2px;
+      z-index: -1;
+      animation: borderSpin 6s linear infinite;
+    }
+    @keyframes borderSpin {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+    .hero-photo-inner {
+      width: 100%; height: 100%;
+      background: var(--surface);
+      border-radius: 2px;
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column;
+      gap: 0.6rem;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      /* ============================================
+         📸 INSERT YOUR PROFESSIONAL HEADSHOT HERE
+         Replace this div's background with:
+         background: url('your-photo.jpg') center/cover;
+         Or add an <img> tag inside this div
+      ============================================ */
+    }
+    .photo-placeholder-icon { font-size: 2.5rem; opacity: 0.3; }
+
+    .hero-stats {
+      position: absolute; bottom: -2rem; right: -2rem;
+      background: rgba(11,14,26,0.9);
+      border: 1px solid var(--border);
+      padding: 1.2rem 1.5rem;
+      backdrop-filter: blur(12px);
+      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+    }
+    .hero-stats .stat {
+      text-align: center;
+      margin-bottom: 0.8rem;
+    }
+    .hero-stats .stat:last-child { margin-bottom: 0; }
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ================================================
+       SECTION SHARED STYLES
+    ================================================ */
+    section {
+      position: relative;
+      z-index: 2;
+      padding: 7rem 4rem;
+    }
+
+    .section-header {
+      display: flex; align-items: baseline; gap: 1.5rem;
+      margin-bottom: 4rem;
+    }
+    .section-num {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--accent);
+      letter-spacing: 0.2em;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      line-height: 1;
+    }
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, var(--border), transparent);
+    }
+
+    /* ================================================
+       ABOUT
+    ================================================ */
+    #about { background: transparent; }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 5rem;
+      align-items: start;
+    }
+
+    .about-text p {
+      font-family: var(--font-serif);
+      font-size: 1.1rem;
+      color: rgba(232,228,240,0.8);
+      margin-bottom: 1.4rem;
+      line-height: 1.85;
+    }
+    .about-text p:first-of-type::first-letter {
+      font-size: 3.5em;
+      font-weight: 600;
+      float: left;
+      line-height: 0.75;
+      margin: 0.1em 0.12em 0 0;
+      color: var(--accent);
+    }
+
+    .about-quote {
+      border-left: 2px solid var(--accent);
+      padding: 1rem 0 1rem 1.8rem;
+      margin: 2rem 0;
+      font-style: italic;
+      font-size: 1.2rem;
+      color: var(--accent);
+      line-height: 1.6;
+      /* ============================================
+         💬 ADD YOUR PERSONAL QUOTE OR MOTTO HERE
+      ============================================ */
+    }
+
+    .about-sidebar { display: flex; flex-direction: column; gap: 2rem; }
+
+    .info-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s, transform 0.3s;
+      clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+    }
+    .info-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--glow), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .info-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .info-card:hover::before { opacity: 1; }
+
+    .info-card-label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 0.5rem;
+    }
+    .info-card-value {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    /* ================================================
+       ACHIEVEMENTS / TIMELINE
+    ================================================ */
+    #achievements { background: var(--surface); }
+
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, var(--accent), var(--accent), transparent);
+    }
+
+    .timeline-item {
+      position: relative;
+      padding: 0 0 3.5rem 2.5rem;
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+    }
+    .timeline-item.visible { opacity: 1; transform: translateX(0); }
+
+    .timeline-dot {
+      position: absolute; left: -2.15rem; top: 0.4rem;
+      width: 14px; height: 14px;
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      background: var(--bg);
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    .timeline-item:hover .timeline-dot {
+      background: var(--accent);
+      box-shadow: 0 0 16px var(--accent);
+    }
+
+    .timeline-year {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--accent2);
+      margin-bottom: 0.4rem;
+    }
+    .timeline-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+    .timeline-org {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--gold);
+      margin-bottom: 0.6rem;
+      letter-spacing: 0.08em;
+    }
+    .timeline-desc {
+      font-size: 0.95rem;
+      color: rgba(232,228,240,0.7);
+      line-height: 1.7;
+    }
+    .timeline-badge {
+      display: inline-block;
+      margin-top: 0.8rem;
+      padding: 0.2rem 0.7rem;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border: 1px solid;
+      border-radius: 2px;
+    }
+    .badge-gold  { border-color: var(--gold);    color: var(--gold); }
+    .badge-green { border-color: var(--accent2); color: var(--accent2); }
+    .badge-purple{ border-color: var(--accent);  color: var(--accent); }
+
+    /* ================================================
+       SKILLS / EXPERTISE
+    ================================================ */
+    #skills { background: transparent; }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .skill-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s var(--ease);
+      cursor: default;
+    }
+    .skill-card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0;
+      height: 2px; width: 0;
+      background: linear-gradient(to right, var(--accent), var(--accent2));
+      transition: width 0.5s var(--ease);
+    }
+    .skill-card:hover { border-color: var(--accent); transform: translateY(-6px); box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+    .skill-card:hover::after { width: 100%; }
+
+    .skill-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      display: block;
+      filter: grayscale(1) brightness(2);
+      transition: filter 0.3s;
+    }
+    .skill-card:hover .skill-icon { filter: grayscale(0) brightness(1.2); }
+
+    .skill-name {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .skill-desc {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .skill-bar-label {
+      display: flex; justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-top: 1.2rem 0 0.3rem;
+    }
+    .skill-bar {
+      height: 2px;
+      background: var(--border);
+      margin-top: 0.8rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .skill-bar-fill {
+      height: 100%;
+      background: linear-gradient(to right, var(--accent), var(--accent2));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 1.2s var(--ease);
+    }
+    .skill-card:hover .skill-bar-fill { transform: scaleX(1); }
+
+    /* ================================================
+       PROJECTS / PORTFOLIO
+    ================================================ */
+    #projects { background: var(--surface); }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+
+    .project-card {
+      position: relative;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: border-color 0.4s, transform 0.4s var(--ease), box-shadow 0.4s;
+      background: var(--bg);
+    }
+    .project-card:hover {
+      border-color: var(--accent2);
+      transform: translateY(-8px) scale(1.01);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    }
+
+    .project-media {
+      width: 100%; height: 240px;
+      background: var(--surface);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 0.6rem;
+      overflow: hidden;
+      position: relative;
+      /* ============================================
+         🎬 INSERT PROJECT IMAGE/VIDEO HERE
+         background: url('project1.jpg') center/cover;
+         Or embed a <video> tag inside this div
+      ============================================ */
+    }
+    .project-media::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 40%, var(--bg) 100%);
+    }
+    .project-media-placeholder {
+      font-size: 2.5rem; opacity: 0.2;
+      font-family: var(--font-mono); font-size: 0.7rem;
+      letter-spacing: 0.1em; color: var(--muted);
+      text-align: center;
+    }
+
+    .project-content { padding: 1.8rem; }
+
+    .project-tags {
+      display: flex; gap: 0.5rem; flex-wrap: wrap;
+      margin-bottom: 0.8rem;
+    }
+    .project-tag {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 0.15rem 0.6rem;
+      border-radius: 1px;
+    }
+
+    .project-title {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+      transition: color 0.3s;
+    }
+    .project-card:hover .project-title { color: var(--accent2); }
+
+    .project-desc {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 1.2rem;
+      /* ============================================
+         📝 ADD PROJECT DESCRIPTION HERE
+      ============================================ */
+    }
+
+    .project-link {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      text-decoration: none;
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      transition: gap 0.3s;
+    }
+    .project-link:hover { gap: 0.9rem; }
+
+    /* Featured (full-width) project card */
+    .project-card.featured {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .project-card.featured .project-media { height: 100%; min-height: 280px; }
+    .project-card.featured .project-content {
+      padding: 3rem;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .project-card.featured .project-title { font-size: 2rem; }
+
+    /* ================================================
+       ACTIVITIES / LEADERSHIP
+    ================================================ */
+    #activities { background: transparent; }
+
+    .activities-list { display: flex; flex-direction: column; gap: 1px; }
+
+    .activity-row {
+      display: grid;
+      grid-template-columns: 60px 1fr auto;
+      align-items: center;
+      gap: 2rem;
+      padding: 1.8rem 2rem;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.35s var(--ease);
+      cursor: default;
+    }
+    .activity-row::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(to bottom, var(--accent), var(--accent2));
+      transform: scaleY(0);
+      transform-origin: bottom;
+      transition: transform 0.4s var(--ease);
+    }
+    .activity-row:hover { background: var(--surface); border-color: var(--accent); transform: translateX(4px); }
+    .activity-row:hover::before { transform: scaleY(1); }
+
+    .activity-icon {
+      width: 50px; height: 50px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .activity-row:hover .activity-icon {
+      border-color: var(--accent2);
+      box-shadow: 0 0 16px rgba(100,244,194,0.3);
+    }
+
+    .activity-info {}
+    .activity-title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+    }
+    .activity-role {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+    }
+    .activity-desc {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+    .activity-years {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      white-space: nowrap;
+      letter-spacing: 0.08em;
+    }
+
+    /* ================================================
+       AWARDS
+    ================================================ */
+    #awards { background: var(--surface); }
+
+    .awards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .award-card {
+      padding: 2rem;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s var(--ease);
+    }
+    .award-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(to right, var(--gold), var(--accent3));
+      transform: scaleX(0);
+      transition: transform 0.5s var(--ease);
+    }
+    .award-card:hover { transform: translateY(-6px); border-color: var(--gold); }
+    .award-card:hover::before { transform: scaleX(1); }
+
+    .award-icon { font-size: 1.8rem; margin-bottom: 1rem; display: block; }
+    .award-title {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+    .award-org {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.6rem;
+    }
+    .award-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+    /* ================================================
+       GALLERY
+    ================================================ */
+    #gallery { background: transparent; }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: auto;
+      gap: 1rem;
+    }
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      background: var(--surface);
+    }
+    .gallery-item:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+    .gallery-item:nth-child(4) { grid-column: span 2; }
+
+    .gallery-thumb {
+      width: 100%; height: 100%; min-height: 180px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 0.5rem;
+      background: var(--surface);
+      transition: transform 0.5s var(--ease);
+      /* ============================================
+         🖼️ INSERT GALLERY IMAGES HERE
+         background: url('image.jpg') center/cover;
+      ============================================ */
+    }
+    .gallery-item:hover .gallery-thumb { transform: scale(1.06); }
+
+    .gallery-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(5,7,13,0.85), transparent);
+      opacity: 0;
+      transition: opacity 0.4s;
+      display: flex; align-items: flex-end;
+      padding: 1.2rem;
+    }
+    .gallery-item:hover .gallery-overlay { opacity: 1; }
+    .gallery-caption {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      color: var(--text);
+    }
+    .gallery-placeholder {
+      font-family: var(--font-mono); font-size: 0.65rem;
+      letter-spacing: 0.1em; color: var(--muted); text-align: center;
+      padding: 1rem;
+    }
+
+    /* ================================================
+       ESSAYS / WRITING
+    ================================================ */
+    #essays { background: var(--surface); }
+
+    .essays-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+
+    .essay-card {
+      padding: 2.5rem;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s var(--ease);
+    }
+    .essay-card:hover { border-color: var(--accent3); transform: translateY(-5px); }
+
+    .essay-num {
+      font-family: var(--font-display);
+      font-size: 4rem;
+      font-weight: 800;
+      color: var(--border);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+      transition: color 0.3s;
+    }
+    .essay-card:hover .essay-num { color: rgba(255,126,179,0.2); }
+
+    .essay-title {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 1.3rem;
+      font-weight: 400;
+      margin-bottom: 0.8rem;
+      /* ============================================
+         📄 ADD YOUR ESSAY TITLE HERE
+      ============================================ */
+    }
+    .essay-excerpt {
+      font-size: 0.92rem;
+      color: var(--muted);
+      line-height: 1.8;
+      /* ============================================
+         📝 ADD A SHORT EXCERPT FROM YOUR ESSAY HERE
+         (2–3 compelling sentences)
+      ============================================ */
+    }
+
+    /* ================================================
+       CONTACT / FOOTER
+    ================================================ */
+    #contact {
+      padding: 7rem 4rem;
+      background: transparent;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    #contact::before {
+      content: 'HELLO';
+      position: absolute;
+      font-family: var(--font-display);
+      font-size: 22vw;
+      font-weight: 800;
+      color: transparent;
+      -webkit-text-stroke: 1px var(--border);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 0;
+    }
+
+    .contact-inner { position: relative; z-index: 1; }
+
+    .contact-heading {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+    .contact-sub {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 1.2rem;
+      color: var(--muted);
+      margin-bottom: 3rem;
+    }
+
+    .contact-links {
+      display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;
+    }
+    .contact-link {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-decoration: none;
+      padding: 0.75rem 1.6rem;
+      border: 1px solid var(--border);
+      transition: all 0.3s var(--ease);
+      position: relative;
+      overflow: hidden;
+    }
+    .contact-link::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.35s var(--ease);
+      z-index: -1;
+    }
+    .contact-link:hover { color: var(--bg); border-color: var(--accent); }
+    .contact-link:hover::before { transform: scaleX(1); }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 4rem;
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+    footer span { color: var(--accent2); }
+
+    /* ================================================
+       SCROLL ANIMATIONS
+    ================================================ */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+    .fade-up:nth-child(2) { transition-delay: 0.1s; }
+    .fade-up:nth-child(3) { transition-delay: 0.2s; }
+    .fade-up:nth-child(4) { transition-delay: 0.3s; }
+    .fade-up:nth-child(5) { transition-delay: 0.4s; }
+
+    /* ================================================
+       RESPONSIVE
+    ================================================ */
+    @media (max-width: 900px) {
+      nav { padding: 1.2rem 2rem; }
+      .nav-links { gap: 1.5rem; }
+      section { padding: 5rem 2rem; }
+      #hero { grid-template-columns: 1fr; padding: 7rem 2rem 4rem; }
+      .hero-visual { display: none; }
+      .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .skills-grid { grid-template-columns: 1fr 1fr; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .project-card.featured { grid-template-columns: 1fr; }
+      .project-card.featured .project-media { min-height: 220px; }
+      .awards-grid { grid-template-columns: 1fr; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; }
+      .gallery-item:nth-child(1) { grid-column: span 2; }
+      .essays-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CURSOR -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- ================================================
+       NAVIGATION
+  ================================================ -->
+  <nav>
+    <!-- ============================================
+         ✏️  CHANGE "[YN]" TO YOUR INITIALS
+    ============================================ -->
+    <a class="nav-logo" href="#hero">[YN]</a>
+    <ul class="nav-links">
+      <li><a href="#about"       data-num="01">About</a></li>
+      <li><a href="#achievements" data-num="02">Journey</a></li>
+      <li><a href="#skills"      data-num="03">Skills</a></li>
+      <li><a href="#projects"    data-num="04">Projects</a></li>
+      <li><a href="#activities"  data-num="05">Activities</a></li>
+      <li><a href="#awards"      data-num="06">Awards</a></li>
+      <li><a href="#essays"      data-num="07">Writing</a></li>
+      <li><a href="#contact"     data-num="08">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- ================================================
+       HERO
+  ================================================ -->
+  <section id="hero">
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+
+    <div class="hero-content">
+      <div class="hero-eyebrow">Class of 2026 · Applicant</div>
+
+      <h1 class="hero-name">
+        <!-- ============================================
+             ✏️  REPLACE WITH YOUR NAME
+        ============================================ -->
+        <span class="line1">Your</span>
+        <span class="line2">Name Here</span>
+      </h1>
+
+      <p class="hero-tagline">
+        <!-- ============================================
+             ✏️  YOUR ONE-LINE PERSONAL BRAND STATEMENT
+             e.g. "Researcher, builder & storyteller
+             driven by the intersection of biology and AI."
+        ============================================ -->
+        [Your personal brand statement goes here — what drives you, what you build, what you dream.]
+      </p>
+
+      <a href="#about" class="hero-cta">
+        <span>Explore My Story</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hero-photo-frame">
+        <div class="hero-photo-inner">
+          <!-- ============================================
+               📸 INSERT YOUR PHOTO:
+               Remove placeholder text and add:
+               <img src="your-photo.jpg" alt="Your Name"
+                    style="width:100%;height:100%;object-fit:cover;">
+          ============================================ -->
+          <span class="photo-placeholder-icon">👤</span>
+          <span style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.1em;color:var(--muted);text-align:center;padding:1rem;">[ INSERT PROFESSIONAL HEADSHOT ]</span>
+        </div>
+      </div>
+
+      <div class="hero-stats">
+        <!-- ============================================
+             ✏️  UPDATE THESE STATS WITH YOUR OWN
+        ============================================ -->
+        <div class="stat">
+          <div class="stat-num">4.0</div>
+          <div class="stat-label">Unweighted GPA</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">1580</div>
+          <div class="stat-label">SAT Score</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">12+</div>
+          <div class="stat-label">AP / IB Courses</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================
+       ABOUT
+  ================================================ -->
+  <section id="about">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">About Me</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="about-grid">
+      <div class="about-text fade-up">
+        <!-- ============================================
+             ✏️  WRITE YOUR PERSONAL STORY HERE
+             Aim for 3–4 paragraphs. Start with a
+             vivid personal detail or anecdote.
+        ============================================ -->
+        <p>
+          [Start with a compelling personal anecdote or vivid image that captures who you are. What moment, place, or experience defines your intellectual identity? Let admissions officers see you, not just your résumé.]
+        </p>
+        <p>
+          [Second paragraph: describe your academic passions. What subjects light you up? What questions keep you up at night? Connect your curiosity to real experiences — a class, a book, a conversation, a discovery.]
+        </p>
+
+        <blockquote class="about-quote">
+          "[ Insert a meaningful quote that reflects your values or outlook on life — from a mentor, a text, or yourself. ]"
+        </blockquote>
+
+        <p>
+          [Third paragraph: who are you outside the classroom? Talk about community, family, culture, or place. What shaped your perspective and makes you uniquely you?]
+        </p>
+      </div>
+
+      <div class="about-sidebar fade-up">
+        <!-- ============================================
+             ✏️  UPDATE EACH INFO CARD WITH YOUR DETAILS
+        ============================================ -->
+        <div class="info-card">
+          <div class="info-card-label">High School</div>
+          <div class="info-card-value">[ Your School Name ]</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Location</div>
+          <div class="info-card-value">[ City, State ]</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Intended Major</div>
+          <div class="info-card-value">[ Major / Field of Study ]</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Career Aspiration</div>
+          <div class="info-card-value">[ Your Dream ]</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Languages</div>
+          <div class="info-card-value">[ e.g. English (Native) · Spanish (Fluent) ]</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================
+       ACHIEVEMENTS / TIMELINE
+  ================================================ -->
+  <section id="achievements">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 class="section-title">My Journey</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="timeline">
+
+      <!-- ============================================
+           ✏️  ADD/EDIT TIMELINE ITEMS — show your
+           academic growth from 9th grade onward.
+           Each item = a major milestone.
+      ============================================ -->
+
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">[ YEAR ]</div>
+        <div class="timeline-title">[ Milestone Title, e.g. Published Research Paper ]</div>
+        <div class="timeline-org">[ Organization / Institution / Competition ]</div>
+        <div class="timeline-desc">[ 2–3 sentences describing this achievement and its significance. What did you learn? What impact did it have? Use specific numbers where possible. ]</div>
+        <span class="timeline-badge badge-gold">[ Label e.g. National Recognition ]</span>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">[ YEAR ]</div>
+        <div class="timeline-title">[ Milestone Title, e.g. Founded School Club ]</div>
+        <div class="timeline-org">[ Organization / School ]</div>
+        <div class="timeline-desc">[ Description. Quantify your impact: members recruited, events organized, funds raised, lives touched. Admissions loves specifics. ]</div>
+        <span class="timeline-badge badge-green">[ Label e.g. Leadership ]</span>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">[ YEAR ]</div>
+        <div class="timeline-title">[ Milestone Title, e.g. Summer Research Internship ]</div>
+        <div class="timeline-org">[ University / Lab / Company ]</div>
+        <div class="timeline-desc">[ Description. What was your project? What methods did you use? What did you discover or build? ]</div>
+        <span class="timeline-badge badge-purple">[ Label e.g. Research ]</span>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">[ YEAR ]</div>
+        <div class="timeline-title">[ Milestone Title, e.g. National Competition Finalist ]</div>
+        <div class="timeline-org">[ Competition Name ]</div>
+        <div class="timeline-desc">[ Description. What was the scale? How many competitors? What was your project or performance? ]</div>
+        <span class="timeline-badge badge-gold">[ Label e.g. Top 1% ]</span>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">[ YEAR ]</div>
+        <div class="timeline-title">[ Milestone Title, e.g. Community Service Project ]</div>
+        <div class="timeline-org">[ Nonprofit / Community Org ]</div>
+        <div class="timeline-desc">[ Description. Community impact, hours contributed, people served. Show your commitment to others. ]</div>
+        <span class="timeline-badge badge-green">[ Label e.g. 200+ Hours ]</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================================================
+       SKILLS
+  ================================================ -->
+  <section id="skills">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Expertise</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="skills-grid">
+
+      <!-- ============================================
+           ✏️  REPLACE SKILL CARDS WITH YOUR ACTUAL SKILLS
+           Hover a card to see the skill bar animate.
+      ============================================ -->
+
+      <div class="skill-card fade-up">
+        <span class="skill-icon">🔬</span>
+        <div class="skill-name">[ Skill Area 1, e.g. Biology Research ]</div>
+        <div class="skill-desc">[ Describe your skill. Tools, techniques, and how you applied it in real contexts. 2–3 sentences. ]</div>
+        <div class="skill-bar"><div class="skill-bar-fill" style="--fill: 90%;"></div></div>
+      </div>
+
+      <div class="skill-card fade-up">
+        <span class="skill-icon">💻</span>
+        <div class="skill-name">[ Skill Area 2, e.g. Python & Data Analysis ]</div>
+        <div class="skill-desc">[ What have you built or analyzed? Mention specific libraries, projects, or outcomes. ]</div>
+        <div class="skill-bar"><div class="skill-bar-fill" style="--fill: 85%;"></div></div>
+      </div>
+
+      <div class="skill-card fade-up">
+        <span class="skill-icon">✍️</span>
+        <div class="skill-name">[ Skill Area 3, e.g. Academic Writing ]</div>
+        <div class="skill-desc">[ Published work, debate experience, or writing accomplishments. Where has your writing made an impact? ]</div>
+        <div class="skill-bar"><div class="skill-bar-fill" style="--fill: 92%;"></div></div>
+      </div>
+
+      <div class="skill-card fade-up">
+        <span class="skill-icon">🎵</span>
+        <div class="skill-name">[ Skill Area 4, e.g. Classical Piano ]</div>
+        <div class="skill-desc">[ Years of practice, performances, awards. What does music mean to you intellectually or personally? ]</div>
+        <div class="skill-bar"><div class="skill-bar-fill" style="--fill: 80%;"></div></div>
+      </div>
+
+      <div class="skill-card fade-up">
+        <span class="skill-icon">🌍</span>
+        <div class="skill-name">[ Skill Area 5, e.g. Public Speaking ]</div>
+        <div class="skill-desc">[ Debate titles, Model UN, TED-style talks, speech competitions. How do you move audiences? ]</div>
+        <div class="skill-bar"><div class="skill-bar-fill" style="--fill: 88%;"></div></div>
+      </div>
+
+      <div class="skill-card fade-up">
+        <span class="skill-icon">🤝</span>
+        <div class="skill-name">[ Skill Area 6, e.g. Team Leadership ]</div>
+        <div class="skill-desc">[ Organizations led, teams managed, initiatives launched. What kind of leader are you? ]</div>
+        <div class="skill-bar"><div class="skill-bar-fill" style="--fill: 95%;"></div></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================================================
+       PROJECTS
+  ================================================ -->
+  <section id="projects">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Projects</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="projects-grid">
+
+      <!-- FEATURED PROJECT (full width) -->
+      <!-- ============================================
+           🌟 YOUR MOST IMPRESSIVE PROJECT GOES HERE
+      ============================================ -->
+      <div class="project-card featured fade-up">
+        <div class="project-media">
+          <!-- INSERT IMAGE OR VIDEO HERE -->
+          <div class="project-media-placeholder">[ INSERT PROJECT IMAGE / VIDEO ]<br><small>background: url('project-main.jpg') center/cover;</small></div>
+        </div>
+        <div class="project-content">
+          <div class="project-tags">
+            <span class="project-tag">[ Tag 1 ]</span>
+            <span class="project-tag">[ Tag 2 ]</span>
+            <span class="project-tag">[ Tag 3 ]</span>
+          </div>
+          <h3 class="project-title">[ Your Flagship Project Title ]</h3>
+          <p class="project-desc">[ Describe your most impressive project in 3–4 sentences. What problem did you solve? What was your approach? What were the results or impact? Use numbers and outcomes whenever possible. This is your chance to show how you think. ]</p>
+          <a href="#" class="project-link">[ View / Read More ] →</a>
+        </div>
+      </div>
+
+      <!-- PROJECT 2 -->
+      <div class="project-card fade-up">
+        <div class="project-media">
+          <div class="project-media-placeholder">[ IMAGE / VIDEO ]</div>
+        </div>
+        <div class="project-content">
+          <div class="project-tags">
+            <span class="project-tag">[ Tag ]</span>
+            <span class="project-tag">[ Tag ]</span>
+          </div>
+          <h3 class="project-title">[ Project 2 Title ]</h3>
+          <p class="project-desc">[ Short description — 2–3 sentences. What was the goal, method, and outcome? ]</p>
+          <a href="#" class="project-link">[ View / Demo / Paper ] →</a>
+        </div>
+      </div>
+
+      <!-- PROJECT 3 -->
+      <div class="project-card fade-up">
+        <div class="project-media">
+          <div class="project-media-placeholder">[ IMAGE / VIDEO ]</div>
+        </div>
+        <div class="project-content">
+          <div class="project-tags">
+            <span class="project-tag">[ Tag ]</span>
+            <span class="project-tag">[ Tag ]</span>
+          </div>
+          <h3 class="project-title">[ Project 3 Title ]</h3>
+          <p class="project-desc">[ Short description — 2–3 sentences. Highlight your individual contribution to team projects. ]</p>
+          <a href="#" class="project-link">[ View / Demo / Paper ] →</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================================================
+       ACTIVITIES & LEADERSHIP
+  ================================================ -->
+  <section id="activities">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2 class="section-title">Activities &amp; Leadership</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="activities-list">
+
+      <!-- ============================================
+           ✏️  LIST ALL EXTRACURRICULAR ACTIVITIES
+           Ordered by significance / impact.
+      ============================================ -->
+
+      <div class="activity-row fade-up">
+        <div class="activity-icon">🏛️</div>
+        <div class="activity-info">
+          <div class="activity-title">[ Activity Name, e.g. Student Government President ]</div>
+          <div class="activity-role">[ Your Role / Title ]</div>
+          <div class="activity-desc">[ 1–2 sentences: what you do, what you built, what you led. Quantify where possible. ]</div>
+        </div>
+        <div class="activity-years">[ 20XX – Present ]</div>
+      </div>
+
+      <div class="activity-row fade-up">
+        <div class="activity-icon">⚗️</div>
+        <div class="activity-info">
+          <div class="activity-title">[ Activity Name, e.g. Science Olympiad Captain ]</div>
+          <div class="activity-role">[ Your Role ]</div>
+          <div class="activity-desc">[ Description with specific accomplishments and team impact. ]</div>
+        </div>
+        <div class="activity-years">[ 20XX – 20XX ]</div>
+      </div>
+
+      <div class="activity-row fade-up">
+        <div class="activity-icon">📰</div>
+        <div class="activity-info">
+          <div class="activity-title">[ Activity Name, e.g. Editor-in-Chief, School Paper ]</div>
+          <div class="activity-role">[ Your Role ]</div>
+          <div class="activity-desc">[ Description of scope, reach, and editorial work. ]</div>
+        </div>
+        <div class="activity-years">[ 20XX – Present ]</div>
+      </div>
+
+      <div class="activity-row fade-up">
+        <div class="activity-icon">🌱</div>
+        <div class="activity-info">
+          <div class="activity-title">[ Activity Name, e.g. Environmental Action Club Founder ]</div>
+          <div class="activity-role">[ Your Role ]</div>
+          <div class="activity-desc">[ Description of your founding vision, current scope, and community engagement. ]</div>
+        </div>
+        <div class="activity-years">[ 20XX – Present ]</div>
+      </div>
+
+      <div class="activity-row fade-up">
+        <div class="activity-icon">🎭</div>
+        <div class="activity-info">
+          <div class="activity-title">[ Activity Name, e.g. Lead Performer, Theater Company ]</div>
+          <div class="activity-role">[ Your Role ]</div>
+          <div class="activity-desc">[ Productions, roles, any notable performances or awards. ]</div>
+        </div>
+        <div class="activity-years">[ 20XX – 20XX ]</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================================================
+       AWARDS
+  ================================================ -->
+  <section id="awards">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <h2 class="section-title">Honors &amp; Awards</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="awards-grid">
+
+      <!-- ============================================
+           ✏️  ADD ALL YOUR AWARDS — lead with national/
+           international, then regional, then school.
+      ============================================ -->
+
+      <div class="award-card fade-up">
+        <span class="award-icon">🥇</span>
+        <div class="award-title">[ Award Name ]</div>
+        <div class="award-org">[ Awarding Organization · Year ]</div>
+        <div class="award-desc">[ What was the award for? Scope of competition? How many were recognized? ]</div>
+      </div>
+
+      <div class="award-card fade-up">
+        <span class="award-icon">🏆</span>
+        <div class="award-title">[ Award Name ]</div>
+        <div class="award-org">[ Awarding Organization · Year ]</div>
+        <div class="award-desc">[ Brief description of the award's significance and how you earned it. ]</div>
+      </div>
+
+      <div class="award-card fade-up">
+        <span class="award-icon">🎖️</span>
+        <div class="award-title">[ Award Name ]</div>
+        <div class="award-org">[ Awarding Organization · Year ]</div>
+        <div class="award-desc">[ Description. Even school-level awards count if they reflect consistent excellence. ]</div>
+      </div>
+
+      <div class="award-card fade-up">
+        <span class="award-icon">📜</span>
+        <div class="award-title">[ Scholarship / Fellowship ]</div>
+        <div class="award-org">[ Organization · Year ]</div>
+        <div class="award-desc">[ Description. Scholarships signal external validation of your potential. ]</div>
+      </div>
+
+      <div class="award-card fade-up">
+        <span class="award-icon">⭐</span>
+        <div class="award-title">[ Honorable Mention / Finalist ]</div>
+        <div class="award-org">[ Competition · Year ]</div>
+        <div class="award-desc">[ Include national finalists and honorable mentions — these still matter. ]</div>
+      </div>
+
+      <div class="award-card fade-up">
+        <span class="award-icon">🌟</span>
+        <div class="award-title">[ Academic Honor, e.g. National Merit ]</div>
+        <div class="award-org">[ Organization · Year ]</div>
+        <div class="award-desc">[ Any standardized academic recognition programs or honor societies. ]</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================================================
+       GALLERY
+  ================================================ -->
+  <section id="gallery">
+    <div class="section-header">
+      <span class="section-num">06.5</span>
+      <h2 class="section-title">Gallery</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="gallery-grid">
+      <!-- ============================================
+           🖼️  REPLACE PLACEHOLDERS WITH YOUR PHOTOS
+           Show yourself in action: competitions,
+           lab work, performances, service, travel.
+           Use: background: url('photo.jpg') center/cover;
+           on the .gallery-thumb div.
+      ============================================ -->
+
+      <div class="gallery-item">
+        <div class="gallery-thumb">
+          <div class="gallery-placeholder">[ INSERT PHOTO ]<br>e.g. Competition Day</div>
+        </div>
+        <div class="gallery-overlay">
+          <span class="gallery-caption">[ Caption — Context ]</span>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <div class="gallery-thumb">
+          <div class="gallery-placeholder">[ INSERT PHOTO ]<br>e.g. Lab Research</div>
+        </div>
+        <div class="gallery-overlay">
+          <span class="gallery-caption">[ Caption ]</span>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <div class="gallery-thumb">
+          <div class="gallery-placeholder">[ INSERT PHOTO ]<br>e.g. Performance</div>
+        </div>
+        <div class="gallery-overlay">
+          <span class="gallery-caption">[ Caption ]</span>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <div class="gallery-thumb">
+          <div class="gallery-placeholder">[ INSERT PHOTO ]<br>e.g. Community Service</div>
+        </div>
+        <div class="gallery-overlay">
+          <span class="gallery-caption">[ Caption ]</span>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <div class="gallery-thumb">
+          <div class="gallery-placeholder">[ INSERT PHOTO ]<br>e.g. Leadership Event</div>
+        </div>
+        <div class="gallery-overlay">
+          <span class="gallery-caption">[ Caption ]</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================================================
+       ESSAYS / WRITING
+  ================================================ -->
+  <section id="essays">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <h2 class="section-title">Writing</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="essays-grid">
+
+      <!-- ============================================
+           ✏️  SHOWCASE YOUR BEST WRITING:
+           College essays, published articles, research
+           abstracts, or creative pieces.
+      ============================================ -->
+
+      <div class="essay-card fade-up">
+        <div class="essay-num">01</div>
+        <div class="essay-title">[ Essay / Article Title — e.g. "The Quiet Revolution in Gut Microbiome Research" ]</div>
+        <div class="essay-excerpt">[ Paste the opening 2–3 sentences of your essay here. Make it arresting. The first line should make them want to read more. Then add a "Read Full Essay →" link below. ]</div>
+        <br><a href="#" class="project-link" style="margin-top:1rem;display:inline-flex;">Read Full Essay →</a>
+      </div>
+
+      <div class="essay-card fade-up">
+        <div class="essay-num">02</div>
+        <div class="essay-title">[ Essay / Article Title ]</div>
+        <div class="essay-excerpt">[ Opening lines. Hooks matter. Surprise, specificity, or a bold claim work well here. ]</div>
+        <br><a href="#" class="project-link" style="margin-top:1rem;display:inline-flex;">Read Full Essay →</a>
+      </div>
+
+      <div class="essay-card fade-up">
+        <div class="essay-num">03</div>
+        <div class="essay-title">[ Published Article / Research Abstract ]</div>
+        <div class="essay-excerpt">[ If you have a published piece, feature it here. Include the journal/platform name below as a link. ]</div>
+        <br><a href="#" class="project-link" style="margin-top:1rem;display:inline-flex;">[ Journal / Platform ] →</a>
+      </div>
+
+      <div class="essay-card fade-up">
+        <div class="essay-num">04</div>
+        <div class="essay-title">[ Personal Statement Excerpt ]</div>
+        <div class="essay-excerpt">[ Optional: share the opening of your Common App essay. This is high-impact real estate — your authentic voice, your narrative arc, your "why." ]</div>
+        <br><a href="#" class="project-link" style="margin-top:1rem;display:inline-flex;">Continue Reading →</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================================================
+       CONTACT
+  ================================================ -->
+  <section id="contact">
+    <div class="contact-inner">
+      <h2 class="contact-heading">Let's Connect</h2>
+      <p class="contact-sub">Passionate about ideas, people, and impact.</p>
+
+      <div class="contact-links">
+        <!-- ============================================
+             ✏️  UPDATE LINKS WITH YOUR ACTUAL PROFILES
+        ============================================ -->
+        <a href="mailto:you@email.com" class="contact-link">✉ Email Me</a>
+        <a href="https://linkedin.com/in/yourprofile" target="_blank" class="contact-link">in LinkedIn</a>
+        <a href="https://github.com/yourusername" target="_blank" class="contact-link">⌥ GitHub</a>
+        <a href="your-resume.pdf" target="_blank" class="contact-link">↓ Résumé / CV</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <!-- ============================================
+         ✏️  UPDATE YOUR NAME AND YEAR
+    ============================================ -->
+    <span>© 2026 <span>[ Your Name ]</span>. All rights reserved.</span>
+    <span>Built with intention. Designed to inspire.</span>
+  </footer>
+
+  <!-- ================================================
+       JAVASCRIPT
+  ================================================ -->
+  <script>
+    /* ----- CUSTOM CURSOR ----- */
+    const dot  = document.getElementById('cursor-dot');
+    const ring = document.getElementById('cursor-ring');
+    let mouseX = 0, mouseY = 0;
+    let ringX = 0, ringY = 0;
+
+    document.addEventListener('mousemove', e => {
+      mouseX = e.clientX; mouseY = e.clientY;
+      dot.style.left = mouseX + 'px';
+      dot.style.top  = mouseY + 'px';
+    });
+
+    function animateRing() {
+      ringX += (mouseX - ringX) * 0.12;
+      ringY += (mouseY - ringY) * 0.12;
+      ring.style.left = ringX + 'px';
+      ring.style.top  = ringY + 'px';
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+
+    /* ----- SCROLL REVEAL ----- */
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.fade-up, .timeline-item').forEach(el => observer.observe(el));
+
+    /* ----- SKILL BAR ANIMATION on hover ----- */
+    document.querySelectorAll('.skill-card').forEach(card => {
+      const fill = card.querySelector('.skill-bar-fill');
+      if (!fill) return;
+      const w = fill.style.getPropertyValue('--fill') || '80%';
+      fill.style.width = '0%';
+      card.addEventListener('mouseenter', () => { fill.style.width = w; });
+      card.addEventListener('mouseleave', () => { fill.style.width = '0%'; });
+    });
+
+    /* ----- PARALLAX hero orbs ----- */
+    document.addEventListener('mousemove', e => {
+      const cx = (e.clientX / window.innerWidth  - 0.5) * 2;
+      const cy = (e.clientY / window.innerHeight - 0.5) * 2;
+      document.querySelector('.hero-orb-1').style.transform = `translate(${cx * -20}px, ${cy * -15}px)`;
+      document.querySelector('.hero-orb-2').style.transform = `translate(${cx * 14}px, ${cy * 10}px)`;
+    });
+
+    /* ----- NAV background on scroll ----- */
+    const nav = document.querySelector('nav');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 60) {
+        nav.style.background = 'rgba(5,7,13,0.97)';
+      } else {
+        nav.style.background = 'linear-gradient(to bottom, rgba(5,7,13,0.95), transparent)';
+      }
+    });
+
+    /* ----- STAGGER timeline delays ----- */
+    document.querySelectorAll('.timeline-item').forEach((item, i) => {
+      item.style.transitionDelay = `${i * 0.1}s`;
+    });
+
+    /* ----- TYPE EFFECT for hero name (optional flavor) ----- */
+    const line2 = document.querySelector('.hero-name .line2');
+    if (line2) {
+      const text = line2.textContent.trim();
+      line2.textContent = '';
+      let i = 0;
+      setTimeout(() => {
+        const t = setInterval(() => {
+          line2.textContent += text[i];
+          i++;
+          if (i >= text.length) clearInterval(t);
+        }, 60);
+      }, 500);
+    }
+  </script>
+
+</body>
+</html>
